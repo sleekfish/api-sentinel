@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>API Sentinel — Security Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/style.css" />
+  <link rel="icon" type="image/svg+xml" href="/static/favicon.svg" />
+</head>
+<body>
+
+  <!-- ══ Header ══════════════════════════════════════════════════════════════ -->
+  <header class="site-header" id="siteHeader">
+    <div class="container header-inner">
+      <div class="logo">
+        <svg width="26" height="26" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+          <rect width="28" height="28" rx="6" fill="#3b82f6"/>
+          <path d="M14 4l8 4v7c0 4-3.5 7.5-8 9-4.5-1.5-8-5-8-9V8l8-4z" fill="white" opacity="0.92"/>
+          <path d="M11 14l2 2 4-4" stroke="#3b82f6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span>API Sentinel</span>
+      </div>
+      <div class="header-right">
+        <div class="header-status" id="header-status" aria-live="polite"></div>
+        <nav class="nav-links">
+          <a href="/api/docs" target="_blank" rel="noopener">API Docs</a>
+          <a href="https://owasp.org/www-project-api-security/" target="_blank" rel="noopener">OWASP Top 10</a>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <!-- ══ Tab bar ══════════════════════════════════════════════════════════════ -->
+  <div class="tab-bar" id="tabBar">
+    <div class="container tab-bar-inner">
+      <button class="tab-btn active" data-tab="dashboard">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="1" y="1" width="6" height="6" rx="1.2"/><rect x="9" y="1" width="6" height="6" rx="1.2"/><rect x="1" y="9" width="6" height="6" rx="1.2"/><rect x="9" y="9" width="6" height="6" rx="1.2"/></svg>
+        Dashboard
+      </button>
+      <button class="tab-btn" data-tab="scanner">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="8" cy="8" r="6.5"/><path d="M8 5v3.5l2 1.5"/></svg>
+        Scanner
+      </button>
+      <button class="tab-btn" data-tab="lab">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5.5 1v7L2 13.5a1 1 0 00.9 1.5h10.2a1 1 0 00.9-1.5L10 8V1"/><path d="M4 1h8"/></svg>
+        BOLA / IDOR Lab
+      </button>
+    </div>
+  </div>
+
+  <main class="container" id="mainContent">
+
+    <!-- ══════════════════════ DASHBOARD TAB ═════════════════════════════════ -->
+    <div id="tab-dashboard" class="tab-panel active">
+
+      <!-- ── KPI row ─────────────────────────────────────────────────────── -->
+      <div class="stat-grid">
+
+        <div class="stat-card stat-card--neutral">
+          <div class="stat-card-icon">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="8" cy="8" r="6.5"/><path d="M8 5v3.5l2 1.5"/></svg>
+          </div>
+          <div class="stat-label">Total Scans</div>
+          <div class="stat-value" id="stat-total-scans"><span class="skeleton"></span></div>
+        </div>
+
+        <div class="stat-card stat-card--ok">
+          <div class="stat-card-icon">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 8.5l3.5 3.5L13 5"/></svg>
+          </div>
+          <div class="stat-label">Completed</div>
+          <div class="stat-value" id="stat-done-scans"><span class="skeleton"></span></div>
+        </div>
+
+        <div class="stat-card stat-card--accent">
+          <div class="stat-card-icon">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="8" cy="8" r="6.5"/><path d="M8 5v3M8 10.5v.5"/></svg>
+          </div>
+          <div class="stat-label">Total Findings</div>
+          <div class="stat-value" id="stat-total-findings"><span class="skeleton"></span></div>
+        </div>
+
+        <div class="stat-card stat-card--critical">
+          <div class="stat-card-icon">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M8 1.5L14.5 13H1.5L8 1.5z"/><path d="M8 6v3M8 10.5v.5"/></svg>
+          </div>
+          <div class="stat-label">Critical</div>
+          <div class="stat-value" id="stat-critical"><span class="skeleton"></span></div>
+        </div>
+
+        <div class="stat-card stat-card--high">
+          <div class="stat-card-icon">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M8 2v8M4.5 6l3.5-4 3.5 4M3.5 13h9"/></svg>
+          </div>
+          <div class="stat-label">High</div>
+          <div class="stat-value" id="stat-high"><span class="skeleton"></span></div>
+        </div>
+
+        <div class="stat-card stat-card--medium">
+          <div class="stat-card-icon">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 5h10M3 8h10M3 11h6"/></svg>
+          </div>
+          <div class="stat-label">Medium</div>
+          <div class="stat-value" id="stat-medium"><span class="skeleton"></span></div>
+        </div>
+
+      </div><!-- /stat-grid -->
+
+      <!-- ── Severity distribution bar ───────────────────────────────────── -->
+      <div class="card sev-bar-card" id="sev-bar-card">
+        <div class="sev-bar-header">
+          <span class="card-label">Severity Distribution</span>
+          <span class="sev-bar-total muted" id="sev-bar-total"></span>
+        </div>
+        <div class="sev-bar-track" id="sev-bar-track" aria-label="Severity distribution bar">
+          <div class="sev-bar-loading"><span class="skeleton" style="width:100%;height:100%;border-radius:6px;display:block"></span></div>
+        </div>
+        <div class="sev-bar-legend" id="sev-bar-legend">
+          <span class="sev-legend-item sev-legend-critical"><span class="sev-dot"></span><span class="sev-legend-label">Critical</span><span class="sev-legend-count" id="sev-legend-critical">—</span></span>
+          <span class="sev-legend-item sev-legend-high"><span class="sev-dot"></span><span class="sev-legend-label">High</span><span class="sev-legend-count" id="sev-legend-high">—</span></span>
+          <span class="sev-legend-item sev-legend-medium"><span class="sev-dot"></span><span class="sev-legend-label">Medium</span><span class="sev-legend-count" id="sev-legend-medium">—</span></span>
+          <span class="sev-legend-item sev-legend-low"><span class="sev-dot"></span><span class="sev-legend-label">Low</span><span class="sev-legend-count" id="sev-legend-low">—</span></span>
+          <span class="sev-legend-item sev-legend-info"><span class="sev-dot"></span><span class="sev-legend-label">Info</span><span class="sev-legend-count" id="sev-legend-info">—</span></span>
+        </div>
+      </div>
+
+      <!-- ── Two-column: scan history + findings panel ────────────────────── -->
+      <div class="dashboard-cols">
+
+        <!-- Left: scan history table -->
+        <section class="card dash-history-card">
+          <div class="dash-card-header">
+            <div class="dash-card-title">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="1" y="3" width="14" height="11" rx="1.5"/><path d="M1 7h14M5 1v4M11 1v4"/></svg>
+              <h2>Scan History</h2>
+            </div>
+            <span class="scan-count-badge" id="scan-count-badge"></span>
+          </div>
+          <div class="table-wrap">
+            <table class="scan-table">
+              <thead>
+                <tr>
+                  <th>Target</th>
+                  <th>Status</th>
+                  <th class="col-num">Issues</th>
+                  <th class="col-num">Age</th>
+                </tr>
+              </thead>
+              <tbody id="scan-list">
+                <tr><td colspan="4" class="skeleton-cell"><div class="skeleton"></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Right: findings panel for selected scan -->
+        <section class="card dash-findings-card">
+
+          <!-- Filter toolbar — always visible inside panel -->
+          <div class="findings-toolbar" id="filter-toolbar">
+            <div class="findings-toolbar-top">
+              <div class="search-wrap">
+                <svg class="search-icon" width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="7" cy="7" r="5.5"/><path d="m12 12 2.5 2.5"/></svg>
+                <input type="search" id="filter-text" class="search-input" placeholder="Search findings…" aria-label="Search findings" />
+              </div>
+            </div>
+            <div class="sev-filter-chips" role="group" aria-label="Filter by severity">
+              <button class="sev-filter-btn active" data-sev="all">All</button>
+              <button class="sev-filter-btn" data-sev="critical">Critical</button>
+              <button class="sev-filter-btn" data-sev="high">High</button>
+              <button class="sev-filter-btn" data-sev="medium">Medium</button>
+              <button class="sev-filter-btn" data-sev="low">Low</button>
+              <button class="sev-filter-btn" data-sev="info">Info</button>
+            </div>
+          </div>
+
+          <!-- Findings content area -->
+          <div id="findings-panel">
+            <div class="empty-state">
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              <p class="empty-state-title">No scan selected</p>
+              <p class="empty-state-sub">Select a row in Scan History to inspect its findings.</p>
+            </div>
+          </div>
+
+        </section>
+
+      </div><!-- /dashboard-cols -->
+
+    </div><!-- /tab-dashboard -->
+
+    <!-- ══════════════════════ SCANNER TAB ═══════════════════════════════════ -->
+    <div id="tab-scanner" class="tab-panel">
+
+      <section class="card scan-card">
+        <div class="scan-card-header">
+          <div>
+            <h1 class="section-title">New Security Scan</h1>
+            <p class="section-sub">Enter an API base URL to probe for common security misconfigurations. Only test hosts you are authorised to scan.</p>
+          </div>
+          <div class="scan-card-badge">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+        </div>
+
+        <form id="scan-form" class="scan-form" autocomplete="off" novalidate>
+          <div class="input-row">
+            <div class="input-wrap">
+              <svg class="input-icon" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="8" cy="8" r="6.5"/><path d="M3.5 8h9M8 3.5C6.5 5.5 6 6.7 6 8s.5 2.5 2 4.5M8 3.5C9.5 5.5 10 6.7 10 8s-.5 2.5-2 4.5"/></svg>
+              <input
+                id="scan-url"
+                type="url"
+                placeholder="https://api.example.com/v1"
+                required
+                class="url-input"
+                aria-label="Target API URL"
+                aria-describedby="scan-url-hint"
+                spellcheck="false"
+                autocorrect="off"
+                autocapitalize="off"
+              />
+            </div>
+            <button type="submit" class="btn-primary" id="scan-submit-btn">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="8" cy="8" r="6.5"/><path d="M6 5.5l4.5 2.5L6 10.5V5.5z" fill="currentColor" stroke="none"/></svg>
+              Run Scan
+            </button>
+          </div>
+          <p id="scan-url-hint" class="input-hint">Must begin with <code>https://</code> or <code>http://</code> — e.g. <code>https://api.example.com/v1</code></p>
+          <label class="checkbox-label" id="scan-auth-label">
+            <input type="checkbox" id="scan-authorized" />
+            <span>I confirm I am authorised to test this target API</span>
+          </label>
+        </form>
+      </section>
+
+      <div id="scan-status" class="scan-status-bar hidden" aria-live="polite"></div>
+
+      <!-- Recent scans quick-view (read-only mirror of dashboard history) -->
+      <section class="card scanner-history-card">
+        <div class="dash-card-header">
+          <div class="dash-card-title">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="1" y="3" width="14" height="11" rx="1.5"/><path d="M1 7h14M5 1v4M11 1v4"/></svg>
+            <h2>Recent Scans</h2>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="scan-table">
+            <thead>
+              <tr>
+                <th>Target</th>
+                <th>Status</th>
+                <th class="col-num">Issues</th>
+                <th class="col-num">Started</th>
+              </tr>
+            </thead>
+            <tbody id="scanner-scan-list">
+              <tr><td colspan="4" class="skeleton-cell"><div class="skeleton"></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </div><!-- /tab-scanner -->
+
+    <!-- ══════════════════════ BOLA LAB TAB ═══════════════════════════════════ -->
+    <div id="tab-lab" class="tab-panel">
+
+      <section class="card lab-intro-card">
+        <div class="lab-header">
+          <h1 class="section-title">BOLA / IDOR Authorization Lab</h1>
+          <span class="tag tag-demo">Local demo — synthetic data only</span>
+        </div>
+        <p class="section-sub">
+          Tests <strong>Broken Object Level Authorization (BOLA)</strong> — OWASP API Security #1.
+          Two isolated test users (alice, bob) each own synthetic records. The test attempts
+          cross-user access to demonstrate the vulnerability and verify the secure implementation blocks it.
+        </p>
+        <div id="lab-info" class="lab-info">
+          <p class="muted">Loading demo setup…</p>
+        </div>
+      </section>
+
+      <section class="card lab-controls-card">
+        <div class="lab-control-row">
+          <div class="mode-toggle-group" role="group" aria-label="API mode">
+            <label class="mode-radio">
+              <input type="radio" name="bola-mode-radio" value="vulnerable" checked
+                onchange="document.getElementById('bola-mode').value='vulnerable'" />
+              <span>Vulnerable</span>
+            </label>
+            <label class="mode-radio">
+              <input type="radio" name="bola-mode-radio" value="secure"
+                onchange="document.getElementById('bola-mode').value='secure'" />
+              <span>Secure</span>
+            </label>
+          </div>
+          <select id="bola-mode" class="sr-only" aria-hidden="true" tabindex="-1">
+            <option value="vulnerable">Vulnerable</option>
+            <option value="secure">Secure</option>
+          </select>
+          <button id="bola-run-btn" class="btn-primary">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 3l8 5-8 5V3z" fill="currentColor" stroke="none"/></svg>
+            Run BOLA Tests
+          </button>
+        </div>
+        <p class="lab-mode-desc muted" id="lab-mode-desc">
+          <strong>Vulnerable mode:</strong> ownership checks are omitted — cross-user access is expected to succeed, demonstrating the BOLA vulnerability.
+        </p>
+      </section>
+
+      <div id="bola-results"></div>
+
+    </div><!-- /tab-lab -->
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <span>API Sentinel &mdash; local security assessment tool</span>
+      <span class="footer-sep">·</span>
+      <span>No data leaves your machine</span>
+    </div>
+  </footer>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
